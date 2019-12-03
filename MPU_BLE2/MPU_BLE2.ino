@@ -54,6 +54,9 @@ void setup() {
 
 }
 
+bool just_left = false;
+bool just_right = false;
+
 void loop() {
   mySensor.accelUpdate();
   mySensor.magUpdate();
@@ -64,8 +67,6 @@ void loop() {
   Serial.println(roll, 6);
   Serial.print("Yaw:\t"); 
   Serial.println(yaw, 6);
-  bool just_left = false;
-  bool just_right = false;
 
   switch(turn_state){
     case OFF: {
@@ -110,9 +111,9 @@ void loop() {
         just_right = true;
       } else if (roll >= LEFT_THRESH) {
         //placeholder
+        turn_state = LEFT;
         just_left = false;
         just_right = false;
-        turn_state = LEFT;
       } else {
         just_left = false;
         just_right = false;
@@ -137,9 +138,9 @@ void loop() {
         just_right = true;
       } else if (roll <= RIGHT_THRESH) {
         //placeholder
+        turn_state = RIGHT;
         just_left = false;
         just_right = false;
-        turn_state = RIGHT;
       } else {
         just_left = false;
         just_right = false;
@@ -151,6 +152,8 @@ void loop() {
       if (roll < LEFT_THRESH / 2) {
         turn_state = OFF;
       }
+      just_left = false;
+      just_right = false;
       break;
     }
     case RIGHT: {
@@ -158,6 +161,8 @@ void loop() {
       if (roll > RIGHT_THRESH / 2) {
         turn_state = OFF;
       }
+      just_left = false;
+      just_right = false;
       break;
     }
     
@@ -165,13 +170,13 @@ void loop() {
 
   switch (brake_state){
     case OFF: {
-      if(){ //accel < 0 || vel == approx 0
+      if(accel_x <= 0){ // || vel == approx 0 (really need velocity?)
         brake_state = ON;
       }
       break;
     }
     case ON: {
-      if(){ //accel > 0
+      if(accel_x > 0){
         brake_state = OFF;
       }
       break;
